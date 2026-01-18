@@ -3,13 +3,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { GoogleStrategy } from './auth/google.strategy/google.strategy';
+import { JwtStrategy } from './auth/jwt.strategy/jwt.strategy';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
       isGlobal: true,
-    }), PrismaModule,
+    }), PrismaModule, AuthModule,
 ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleStrategy, JwtStrategy],
 })
 export class AppModule {}

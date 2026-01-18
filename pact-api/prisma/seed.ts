@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
@@ -9,6 +10,8 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
+  const hash = await bcrypt.hash('123456', 10);
+
   await prisma.user.deleteMany();
 
   await prisma.user.createMany({
@@ -16,12 +19,12 @@ async function main() {
       {
         email: 'alice@test.com',
         username: 'alice',
-        password: '123456',
+        password: hash,
       },
       {
         email: 'bob@test.com',
         username: 'bob',
-        password: '123456',
+        password: hash,
       },
     ],
   });
@@ -31,6 +34,4 @@ async function main() {
 
 main()
   .catch(console.error)
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());
