@@ -13,6 +13,26 @@ enum TaskType {
   SHARED
 }
 
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Task {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  completed   Boolean       @default(false)
+  priority    TaskPriority  @default(MEDIUM)
+  deadline    DateTime?
+  type        TaskType
+  ownerId     String
+  createdAt   DateTime      @default(now())
+
+  owner User @relation(fields: [ownerId], references: [id])
+}
+
 enum FriendshipStatus {
   PENDING
   ACCEPTED
@@ -35,6 +55,8 @@ model User {
   
   sentRequests     Friendship[] @relation("RequestSent")
   receivedRequests Friendship[] @relation("RequestReceived")
+
+  tasks Task[]
 }
 
 model Friendship {

@@ -7,11 +7,12 @@ import { GoogleStrategy } from './auth/google.strategy/google.strategy';
 import { JwtStrategy } from './auth/jwt.strategy/jwt.strategy';
 import { AuthModule } from './auth/auth.module';
 import { FriendshipsModule } from './friendships/friendships.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
       isGlobal: true,
-    }), PrismaModule, AuthModule, FriendshipsModule,
+    }), PrismaModule, AuthModule, FriendshipsModule, TasksModule,
 ],
   controllers: [AppController],
   providers: [AppService, GoogleStrategy, JwtStrategy],
