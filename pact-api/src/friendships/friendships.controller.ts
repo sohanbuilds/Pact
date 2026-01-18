@@ -3,7 +3,6 @@ import { FriendshipsService } from './friendships.service';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator/current-user.decorator';
 import { Get } from '@nestjs/common';
-import { BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('friends')
