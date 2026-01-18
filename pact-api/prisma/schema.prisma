@@ -32,4 +32,20 @@ model User {
   password  String?      // nullable
   googleId  String?      @unique
   createdAt DateTime @default(now())
+  
+  sentRequests     Friendship[] @relation("RequestSent")
+  receivedRequests Friendship[] @relation("RequestReceived")
+}
+
+model Friendship {
+  id          String           @id @default(uuid())
+  requesterId String
+  receiverId  String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+
+  requester User @relation("RequestSent", fields: [requesterId], references: [id])
+  receiver  User @relation("RequestReceived", fields: [receiverId], references: [id])
+
+  @@unique([requesterId, receiverId])
 }
