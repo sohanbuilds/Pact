@@ -28,9 +28,11 @@ model Task {
   deadline    DateTime?
   type        TaskType
   ownerId     String
+  assigneeId  String?
   createdAt   DateTime      @default(now())
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner    User  @relation("OwnedTasks", fields: [ownerId], references: [id])
+  assignee User? @relation("AssignedTasks", fields: [assigneeId], references: [id])
 }
 
 enum FriendshipStatus {
@@ -49,15 +51,17 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   username  String
-  password  String?      // nullable
-  googleId  String?      @unique
+  password  String?
+  googleId  String?  @unique
   createdAt DateTime @default(now())
-  
+
+  tasksAssigned Task[] @relation("AssignedTasks")
+  tasksOwned    Task[] @relation("OwnedTasks")
+
   sentRequests     Friendship[] @relation("RequestSent")
   receivedRequests Friendship[] @relation("RequestReceived")
-
-  tasks Task[]
 }
+
 
 model Friendship {
   id          String           @id @default(uuid())
