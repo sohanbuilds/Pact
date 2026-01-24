@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, ForbiddenException, Req } from '@nestjs/common';
 import { ApiOperation, ApiBody, ApiCookieAuth, ApiParam } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { JwtAuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
@@ -7,6 +7,7 @@ import { CreateTaskDto } from './dto/create-task.dto/create-task.dto';
 import { FriendGuard } from '../friendships/friend/friend.guard';
 import { CreatePrivateTaskDto } from './dto/create-private-task.dto/create-private-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto/update-task.dto';
+import { RolesGuard } from '../groups/roles/roles.guard';
 
 @ApiCookieAuth()
 @UseGuards(JwtAuthGuard)
@@ -84,5 +85,30 @@ export class TasksController {
         @CurrentUser() user,
     ) {
         return this.tasks.deletePrivateTask(id, user.id);
+    }
+
+    @ApiOperation({ summary: 'Create shared task (ADMIN/EDITOR)' })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Post('/group/:id/tasks')
+    createShared(
+        @Param('id') groupId: string,
+        @Body() dto: CreateTaskDto,
+        @CurrentUser() user,
+        @Req() req,
+    ) {
+        if (!['ADMIN', 'EDITOR'].includes(req.role)) {
+            throw new ForbiddenException();
+        }
+        return this.tasks.createSharedTask(groupId, user.id, dto);
+    }
+
+    @ApiOperation({ summary: 'List shared tasks' })
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('/group/:id/tasks')
+    listShared(@Param('id') groupId: string, @Req() req) {
+        if (req.role !== 'ADMIN') {
+            throw new ForbiddenException();
+        }
+        return this.tasks.getSharedTasks(groupId);
     }
 }

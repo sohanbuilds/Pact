@@ -146,4 +146,25 @@ export class TasksService {
             where: { id: taskId },
         });
     }
+
+    async createSharedTask(
+        groupId: string,
+        ownerId: string,
+        dto: CreateTaskDto,
+    ) {
+    return this.prisma.task.create({
+            data: {
+            ...dto,
+            type: 'SHARED',
+            ownerId,
+            groupId,
+            },
+        });
+    }
+
+    async getSharedTasks(groupId: string) {
+        return this.prisma.task.findMany({
+            where: { groupId, type: 'SHARED' },
+        });
+    }
 }

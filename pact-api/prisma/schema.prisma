@@ -29,10 +29,12 @@ model Task {
   type        TaskType
   ownerId     String
   assigneeId  String?
+  groupId     String?
   createdAt   DateTime      @default(now())
 
-  owner    User  @relation("OwnedTasks", fields: [ownerId], references: [id])
-  assignee User? @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  owner    User   @relation("OwnedTasks", fields: [ownerId], references: [id])
+  assignee User?  @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  group    Group? @relation(fields: [groupId], references: [id])
 }
 
 enum FriendshipStatus {
@@ -60,8 +62,9 @@ model User {
 
   sentRequests     Friendship[] @relation("RequestSent")
   receivedRequests Friendship[] @relation("RequestReceived")
-}
 
+  groupMemberships GroupMember[]
+}
 
 model Friendship {
   id          String           @id @default(uuid())
@@ -74,4 +77,25 @@ model Friendship {
   receiver  User @relation("RequestReceived", fields: [receiverId], references: [id])
 
   @@unique([requesterId, receiverId])
+}
+
+model Group {
+  id        String        @id @default(uuid())
+  name      String
+  createdAt DateTime      @default(now())
+
+  members GroupMember[]
+  tasks   Task[]
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  userId  String
+  groupId String
+  role    Role
+
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
+  @@unique([userId, groupId])
 }
